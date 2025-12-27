@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Play Example</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden; /* Maus-Scrolling verhindern */
+    }
+    .search-btn {
+      font-size: 24px;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-top: 50px;
+    }
+    #mainFrame, #videoFrame {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #videoFrame {
+      display: none;
+      background-color: black;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Video füllt ganzen Frame */
+      pointer-events: none; /* keine Interaktion mit Video möglich */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Button zum Starten des Videos -->
+  <button class="search-btn" id="searchBtn" onclick="playVideo()">🔍</button>
+
+  <!-- Main Frame -->
+  <div id="mainFrame">
+    <h1>Information for the private documents</h1>
+    <div style="font-size:32px; letter-spacing:20px;">. . .</div>
+  </div>
+
+  <!-- Video Frame -->
+  <div id="videoFrame">
+    <video id="myVideo">
+      <source src="video.mp4" type="video/mp4">
+      Dein Browser unterstützt dieses Video nicht.
+    </video>
+  </div>
+
+  <script>
+    function playVideo() {
+      const searchBtn = document.getElementById("searchBtn");
+      const mainFrame = document.getElementById("mainFrame");
+      const videoFrame = document.getElementById("videoFrame");
+      const video = document.getElementById("myVideo");
+
+      // Button deaktivieren
+      searchBtn.disabled = true;
+      searchBtn.style.display = "none";
+
+      // Main-Frame ausblenden, Video anzeigen
+      mainFrame.style.display = "none";
+      videoFrame.style.display = "flex";
+
+      // Video starten mit Ton
+      video.muted = false;
+      video.play();
+
+      // Nach einmaligem Abspielen → zurück zum Hauptmenü
+      video.onended = () => {
+        videoFrame.style.display = "none";
+        mainFrame.style.display = "flex";
+      };
+
+      // Maus- und Tastaturinteraktion sperren während Video läuft
+      document.addEventListener("keydown", blockInput, true);
+      document.addEventListener("mousemove", blockInput, true);
+      document.addEventListener("click", blockInput, true);
+
+      function blockInput(e) {
+        if (videoFrame.style.display === "flex") {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }
+
+      // Sobald Video zu Ende → Interaktion wieder erlauben
+      video.addEventListener("ended", () => {
+        document.removeEventListener("keydown", blockInput, true);
+        document.removeEventListener("mousemove", blockInput, true);
+        document.removeEventListener("click", blockInput, true);
+      });
+    }
+  </script>
+
+</body>
+</html>
